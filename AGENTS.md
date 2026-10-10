@@ -1,9 +1,15 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Rules for the AI Coding Agent
 
-## This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+- **Stack:** Next.js (App Router) + TypeScript (strict), PostgreSQL + pgvector, Drizzle ORM, Auth.js v5, Tailwind CSS + shadcn/ui, Zod, Vitest, Playwright.
+- Use **server components and route handlers** by default. Use client components only when interactivity requires it.
+- Validate all external input (request bodies, query params, API responses) with **Zod**.
+- All third-party API keys stay **server-side only**. Never import server modules into client components.
+- Database access goes through `src/db/` and `src/server/` only. No SQL in components.
+- One `items` table for all media types (`type` column). Do not create separate movie/tv/book tables.
+- Items from external APIs are **cached in our database** the first time they're seen. Recommendations run on our data, never on live external calls.
+- Embeddings are computed **once per item** and stored. Never recompute on a request path.
+- Keep functions small and typed. No `any`. Prefer pure functions for scoring/ranking logic so they can be unit tested.
+- Write tests for: provider normalizers, taste-vector math, ranking/blending, and API route validation.
+- Make small commits. After each task: run `pnpm lint`, `pnpm typecheck`, `pnpm test`, and fix failures before moving on.
+- Do not add dependencies without saying why. Do not implement features outside the current task.
+- When unsure about a decision, pick the simplest option and note it in `DECISIONS.md`.
