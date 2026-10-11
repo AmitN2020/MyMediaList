@@ -51,6 +51,7 @@ describe("Database Schema", () => {
     const userColumns = getTableColumns(users);
     expect(userColumns.id).toBeDefined();
     expect(userColumns.email).toBeDefined();
+    expect(userColumns.password).toBeDefined();
 
     const accountColumns = getTableColumns(accounts);
     expect(accountColumns.userId).toBeDefined();
