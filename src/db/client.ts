@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import * as schema from "./schema";
 
 declare global {
   var _postgresClient: postgres.Sql | undefined;
@@ -18,5 +19,5 @@ if (process.env.NODE_ENV !== "production") {
   globalThis._postgresClient = sql;
 }
 
-export const db = drizzle(sql);
-export { sql };
+export const db = drizzle(sql, { schema });
+export { sql, schema };
