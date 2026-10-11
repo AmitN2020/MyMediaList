@@ -11,7 +11,7 @@ const sql =
   globalThis._postgresClient ||
   postgres(connectionString || "postgresql://postgres:postgres@localhost:5432/mymedialist", {
     max: 10,
-    prepare: false, // Essential for Neon / Supabase transaction poolers
+    prepare: false,
   });
 
 if (process.env.NODE_ENV !== "production") {
