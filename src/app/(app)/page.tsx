@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 
 async function HeroActions() {
-  noStore();
+  await connection();
   const session = await auth();
 
   if (session?.user) {

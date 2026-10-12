@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 
 async function UserMenu() {
-  noStore();
+  await connection();
   const session = await auth();
 
   if (!session?.user) {
