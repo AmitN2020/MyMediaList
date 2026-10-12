@@ -1,0 +1,23 @@
+{
+  "key": "/works/OL893415W",
+  "title": "Dune",
+  "description": {
+    "type": "/type/text",
+    "value": "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides, heir to a noble family tasked with ruling an inhospitable world."
+  },
+  "subjects": [
+    "Science fiction",
+    "Dune (Imaginary place)",
+    "Fiction",
+    "Life on other planets",
+    "Kings and rulers",
+    "Ecology"
+  ],
+  "covers": [9255906],
+  "authors": [
+    {
+      "author": { "key": "/authors/OL7934A" }
+    }
+  ],
+  "first_publish_date": "1965"
+}

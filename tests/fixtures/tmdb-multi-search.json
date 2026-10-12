@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "id": 157336,
+      "media_type": "movie",
+      "title": "Interstellar",
+      "overview": "Explorers travel through a wormhole in space.",
+      "poster_path": "/gEU2QniL6L9a1Y3KsPPxtZfaapG.jpg",
+      "release_date": "2014-11-05"
+    },
+    {
+      "id": 1399,
+      "media_type": "tv",
+      "name": "Game of Thrones",
+      "overview": "Nine noble families fight for control over the lands of Westeros.",
+      "poster_path": "/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
+      "first_air_date": "2011-04-17"
+    },
+    {
+      "id": 31,
+      "media_type": "person",
+      "name": "Tom Hanks"
+    }
+  ]
+}

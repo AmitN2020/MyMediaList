@@ -1,7 +1,9 @@
 import { Suspense } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 import { auth } from "@/auth";
 
 async function LibraryGreeting() {
+  noStore();
   const session = await auth();
   return (
     <p className="text-muted-foreground text-sm">

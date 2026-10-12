@@ -1,0 +1,27 @@
+{
+  "id": 1396,
+  "name": "Breaking Bad",
+  "overview": "A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine in order to secure his family's future.",
+  "poster_path": "/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+  "first_air_date": "2008-01-20",
+  "number_of_seasons": 5,
+  "number_of_episodes": 62,
+  "genres": [
+    { "id": 18, "name": "Drama" },
+    { "id": 80, "name": "Crime" }
+  ],
+  "created_by": [{ "name": "Vince Gilligan" }],
+  "credits": {
+    "crew": [
+      { "job": "Executive Producer", "name": "Vince Gilligan" },
+      { "job": "Director", "name": "Michelle MacLaren" }
+    ]
+  },
+  "keywords": {
+    "results": [
+      { "id": 818, "name": "based on novel or play" },
+      { "id": 1415, "name": "gun" },
+      { "id": 1488, "name": "chemistry" }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": 157336,
+  "title": "Interstellar",
+  "overview": "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+  "poster_path": "/gEU2QniL6L9a1Y3KsPPxtZfaapG.jpg",
+  "release_date": "2014-11-05",
+  "runtime": 169,
+  "genres": [
+    { "id": 12, "name": "Adventure" },
+    { "id": 18, "name": "Drama" },
+    { "id": 878, "name": "Science Fiction" }
+  ],
+  "credits": {
+    "crew": [
+      { "job": "Director", "name": "Christopher Nolan" },
+      { "job": "Writer", "name": "Jonathan Nolan" },
+      { "job": "Director of Photography", "name": "Hoyte van Hoytema" }
+    ]
+  },
+  "keywords": {
+    "keywords": [
+      { "id": 9672, "name": "based on novel or play" },
+      { "id": 3801, "name": "space travel" },
+      { "id": 4565, "name": "dystopia" }
+    ]
+  }
+}
