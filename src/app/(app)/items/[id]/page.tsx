@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { BookOpen, Film, Tv, ArrowLeft } from "lucide-react";
 import { db } from "@/db/client";
 import { items } from "@/db/schema";
@@ -17,7 +18,24 @@ interface PageProps {
 const TYPE_ICON = { movie: Film, tv: Tv, book: BookOpen };
 const TYPE_LABEL = { movie: "Movie", tv: "TV Show", book: "Book" };
 
-export default async function ItemDetailPage({ params }: PageProps) {
+function ItemDetailSkeleton() {
+  return (
+    <div className="container mx-auto max-w-5xl px-4 py-8 sm:px-8">
+      <div className="h-5 w-28 animate-pulse rounded bg-muted" />
+      <div className="mt-8 flex flex-col gap-8 sm:flex-row">
+        <div className="aspect-[2/3] w-full animate-pulse rounded-2xl bg-muted sm:w-48 lg:w-56" />
+        <div className="flex-1 space-y-4">
+          <div className="h-6 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-10 w-2/3 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+          <div className="h-24 w-full animate-pulse rounded bg-muted" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function ItemDetails({ params }: PageProps) {
   const { id } = await params;
 
   const item = await db.query.items.findFirst({ where: eq(items.id, id) });
@@ -176,5 +194,13 @@ export default async function ItemDetailPage({ params }: PageProps) {
         </section>
       )}
     </div>
+  );
+}
+
+export default function ItemDetailPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<ItemDetailSkeleton />}>
+      <ItemDetails params={params} />
+    </Suspense>
   );
 }
