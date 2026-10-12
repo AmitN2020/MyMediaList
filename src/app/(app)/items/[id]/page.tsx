@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { getUserItem } from "@/server/library";
 import { STATUS_LABELS } from "@/components/status-select";
+import { getSimilarItems } from "@/server/recs/recommendations";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -26,6 +27,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
   const userItem = session?.user?.id
     ? await getUserItem(session.user.id, item.id)
     : null;
+  const similar = session?.user?.id
+    ? await getSimilarItems(item.id, session.user.id)
+    : [];
 
   const Icon = TYPE_ICON[item.type];
   const metadata = item.metadata as Record<string, unknown> | null;
@@ -157,6 +161,20 @@ export default async function ItemDetailPage({ params }: PageProps) {
           )}
         </div>
       </div>
+
+      {similar && similar.length > 0 && (
+        <section className="mt-12 border-t border-border/60 pt-8">
+          <h2 className="text-xl font-semibold">Similar items</h2>
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {similar.map((match) => (
+              <Link key={match.id} href={`/items/${match.id}`} className="rounded-xl border border-border/60 bg-card p-4 transition-shadow hover:shadow-sm">
+                <p className="text-sm font-semibold">{match.title}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{match.type} · {match.year ?? "Unknown year"}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

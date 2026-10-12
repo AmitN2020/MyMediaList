@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { RecommendationShelves } from "@/components/recommendation-shelves";
 
 async function HeroActions() {
   await connection();
@@ -104,6 +105,10 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      <Suspense fallback={<div className="mt-12 h-48 animate-pulse rounded-2xl bg-muted/40" />}>
+        <RecommendationShelves />
+      </Suspense>
     </div>
   );
 }
