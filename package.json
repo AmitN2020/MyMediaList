@@ -9,10 +9,12 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:check": "tsx scripts/test-db.ts",
+    "db:check": "tsx --env-file=.env scripts/test-db.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:backfill": "tsx --env-file=.env scripts/backfill-embeddings.ts",
+    "seed": "tsx --env-file=.env scripts/seed.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",

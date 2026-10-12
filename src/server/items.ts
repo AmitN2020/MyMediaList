@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { items } from "@/db/schema";
 import type { CacheItemRequest } from "@/lib/item-schemas";
+import { embedItem } from "@/server/embeddings/service";
 import { OpenLibraryProvider } from "@/server/providers/openlibrary";
 import { TmdbProvider } from "@/server/providers/tmdb";
 import type { ItemSource, NormalizedItem, Provider } from "@/server/providers/types";
@@ -111,5 +112,10 @@ export async function getOrCreateCachedItem(
     throw new ItemNotFoundError(request.source, request.externalId);
   }
 
-  return store.upsert(normalized);
+  const stored = await store.upsert(normalized);
+  void embedItem(stored.id).catch((err) => {
+    console.error("Background item embedding error:", err);
+  });
+
+  return stored;
 }

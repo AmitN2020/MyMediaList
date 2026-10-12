@@ -114,7 +114,7 @@ export const items = pgTable(
       .default(sql`'{}'::text[]`), // directors / authors
     coverUrl: text("cover_url"),
     metadata: jsonb("metadata"), // runtime, seasons, page count, etc.
-    embedding: vector("embedding", { dimensions: 1536 }),
+    embedding: vector("embedding", { dimensions: 768 }),
     embeddingModel: text("embedding_model"), // so we can re-embed on model change
     searchTsv: tsvector("search_tsv").generatedAlwaysAs(
       (): ReturnType<typeof sql> =>

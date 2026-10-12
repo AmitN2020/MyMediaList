@@ -6,6 +6,8 @@ declare global {
   var _postgresClient: postgres.Sql | undefined;
 }
 
+process.loadEnvFile?.();
+
 const connectionString = process.env.DATABASE_URL;
 
 const sql =

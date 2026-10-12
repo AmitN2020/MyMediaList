@@ -22,6 +22,13 @@
       "when": 1791823730038,
       "tag": "0002_demonic_young_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791827935167,
+      "tag": "0003_gifted_sersi",
+      "breakpoints": true
     }
   ]
 }
