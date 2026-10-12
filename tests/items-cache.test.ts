@@ -25,6 +25,7 @@ function storedFrom(normalized: NormalizedItem, id = "item-1"): StoredItem {
     metadata: normalized.metadata ?? null,
     embedding: null,
     embeddingModel: null,
+    searchTsv: null,
     createdAt: now,
     updatedAt: now,
   };

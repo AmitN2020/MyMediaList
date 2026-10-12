@@ -32,6 +32,7 @@ describe("Database Schema", () => {
     expect(columns.externalId).toBeDefined();
     expect(columns.title).toBeDefined();
     expect(columns.embedding).toBeDefined();
+    expect(columns.searchTsv).toBeDefined();
     expect(columns.genres).toBeDefined();
     expect(columns.keywords).toBeDefined();
     expect(columns.creators).toBeDefined();

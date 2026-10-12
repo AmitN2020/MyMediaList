@@ -12,8 +12,15 @@ import {
   vector,
   primaryKey,
   check,
+  customType,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
+
+export const tsvector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
 
 // Enums
 export const itemType = pgEnum("item_type", ["movie", "tv", "book"]);
@@ -109,6 +116,10 @@ export const items = pgTable(
     metadata: jsonb("metadata"), // runtime, seasons, page count, etc.
     embedding: vector("embedding", { dimensions: 1536 }),
     embeddingModel: text("embedding_model"), // so we can re-embed on model change
+    searchTsv: tsvector("search_tsv").generatedAlwaysAs(
+      (): ReturnType<typeof sql> =>
+        sql`setweight(to_tsvector('english'::regconfig, coalesce("title", '')), 'A') || setweight(to_tsvector('english'::regconfig, coalesce(immutable_array_to_string("creators", ' '), '')), 'B') || setweight(to_tsvector('english'::regconfig, coalesce("description", '') || ' ' || coalesce(immutable_array_to_string("genres", ' '), '') || ' ' || coalesce(immutable_array_to_string("keywords", ' '), '')), 'C')`
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -116,6 +127,7 @@ export const items = pgTable(
     uniqueIndex("items_source_external_idx").on(t.source, t.externalId),
     index("items_type_idx").on(t.type),
     index("items_embedding_idx").using("hnsw", t.embedding.op("vector_cosine_ops")),
+    index("items_search_tsv_idx").using("gin", t.searchTsv),
   ]
 );
 
