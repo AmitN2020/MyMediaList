@@ -13,6 +13,11 @@ const TYPES: Array<{ value: MediaType; label: string }> = [
   { value: "tv", label: "TV shows" },
   { value: "book", label: "Books" },
 ];
+const TASTE_OPTIONS = [
+  { value: 0, label: "Query only" },
+  { value: 0.3, label: "30% my taste" },
+  { value: 0.6, label: "60% my taste" },
+];
 
 function asNormalizedItem(item: SemanticDiscoverResponse["items"][number]): NormalizedItem {
   return {
@@ -33,6 +38,7 @@ export function DiscoverClient() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<MediaType>("all");
   const [excludeLogged, setExcludeLogged] = useState(true);
+  const [tasteInfluence, setTasteInfluence] = useState(0.3);
   const [results, setResults] = useState<SemanticDiscoverResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +50,13 @@ export function DiscoverClient() {
     setError(null);
     try {
       const params = new URLSearchParams({
-        mode: "semantic",
         q: query.trim(),
         type,
         limit: "5",
+        taste: String(tasteInfluence),
         exclude_logged: String(excludeLogged),
       });
-      const response = await fetch(`/api/discover?${params}`);
+      const response = await fetch(`/api/recommendations?${params}`);
       const json: unknown = await response.json();
       if (!response.ok) {
         const message = typeof json === "object" && json !== null && "error" in json
@@ -113,6 +119,12 @@ export function DiscoverClient() {
           {TYPES.map(({ value, label }) => <button key={value} type="button" onClick={() => setType(value)} className={`rounded-full border px-3 py-1.5 text-xs font-medium ${type === value ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}>{label}</button>)}
           <label className="ml-1 flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={excludeLogged} onChange={(event) => setExcludeLogged(event.target.checked)} /> Hide library items</label>
         </div>
+        <fieldset>
+          <legend className="mb-2 text-xs font-medium text-muted-foreground">Influence of my taste</legend>
+          <div className="flex flex-wrap gap-2">
+            {TASTE_OPTIONS.map(({ value, label }) => <button key={value} type="button" onClick={() => setTasteInfluence(value)} className={`rounded-full border px-3 py-1.5 text-xs font-medium ${tasteInfluence === value ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}>{label}</button>)}
+          </div>
+        </fieldset>
       </form>
 
       {error && <div role="alert" className="mt-6 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</div>}

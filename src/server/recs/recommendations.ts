@@ -5,9 +5,11 @@ import type { ItemStatus } from "@/lib/library-schemas";
 import { toVectorLiteral, type SemanticSearchHit } from "@/server/recs/search";
 import { selectRecentActivities, type RecentActivityInput } from "@/server/recs/recent-activity";
 import { buildTasteVector, type TasteVectorInput } from "@/server/recs/taste-vector";
+import { blendVectors } from "@/server/recs/blend";
+import { getQueryEmbedding } from "@/server/recs/search";
 import type { ItemType } from "@/server/providers/types";
 
-export type RecommendationResult = SemanticSearchHit & { reason: "taste" | "popular" };
+export type RecommendationResult = SemanticSearchHit & { reason: "taste" | "popular" | "blend" };
 export type RecentRecommendation = SemanticSearchHit & { becauseOf: { itemId: string; title: string } };
 
 export function applyGenreDiversity<T extends { genres: string[] }>(candidates: T[], limit: number, cap = 2): T[] {
@@ -23,11 +25,14 @@ export function applyGenreDiversity<T extends { genres: string[] }>(candidates: 
   return selected;
 }
 
-async function nearestItems(vector: number[], userId: string, limit: number, type?: ItemType, excludeIds: string[] = []): Promise<SemanticSearchHit[]> {
+async function nearestItems(vector: number[], userId: string, limit: number, type?: ItemType, excludeIds: string[] = [], excludeLogged = true, yearFrom?: number, yearTo?: number): Promise<SemanticSearchHit[]> {
   const vectorLiteral = toVectorLiteral(vector);
-  const conditions = [sql`${items.embedding} IS NOT NULL`, sql`${items.id} NOT IN (SELECT ${userItems.itemId} FROM ${userItems} WHERE ${userItems.userId} = ${userId})`];
+  const conditions = [sql`${items.embedding} IS NOT NULL`];
+  if (excludeLogged) conditions.push(sql`${items.id} NOT IN (SELECT ${userItems.itemId} FROM ${userItems} WHERE ${userItems.userId} = ${userId})`);
   if (type) conditions.push(eq(items.type, type));
   if (excludeIds.length > 0) conditions.push(notInArray(items.id, excludeIds));
+  if (yearFrom !== undefined) conditions.push(sql`${items.year} >= ${yearFrom}`);
+  if (yearTo !== undefined) conditions.push(sql`${items.year} <= ${yearTo}`);
   const distance = sql`${items.embedding} <=> ${vectorLiteral}::vector`;
   const score = sql<number>`1 - (${distance})`;
   return db.select({ id: items.id, type: items.type, source: items.source, externalId: items.externalId, title: items.title, description: items.description, year: items.year, genres: items.genres, keywords: items.keywords, creators: items.creators, coverUrl: items.coverUrl, metadata: items.metadata, embedding: items.embedding, embeddingModel: items.embeddingModel, searchTsv: items.searchTsv, createdAt: items.createdAt, updatedAt: items.updatedAt, score })
@@ -37,6 +42,10 @@ async function nearestItems(vector: number[], userId: string, limit: number, typ
 async function getTasteInputs(userId: string): Promise<TasteVectorInput[]> {
   const rows = await db.query.userItems.findMany({ where: eq(userItems.userId, userId), with: { item: true } });
   return rows.flatMap((row) => row.item.embedding ? [{ embedding: row.item.embedding, rating: row.rating, status: row.status, completedAt: row.completedAt, updatedAt: row.updatedAt }] : []);
+}
+
+export async function getUserTasteVector(userId: string): Promise<number[] | null> {
+  return buildTasteVector(await getTasteInputs(userId));
 }
 
 async function popularItems(userId: string, type: "all" | ItemType, limit: number): Promise<SemanticSearchHit[]> {
@@ -56,6 +65,17 @@ export async function getRecommendations(userId: string, type: "all" | ItemType 
   }
   const candidates = await nearestItems(taste, userId, limit * 4, type === "all" ? undefined : type);
   return { items: applyGenreDiversity(candidates, limit).map((item) => ({ ...item, reason: "taste" })), coldStart: false };
+}
+
+export async function getBlendedRecommendations(
+  userId: string,
+  params: { q: string; type: "all" | ItemType; limit: number; tasteInfluence: number; excludeLogged: boolean; yearFrom?: number; yearTo?: number },
+): Promise<{ items: RecommendationResult[]; hasTaste: boolean }> {
+  const [queryVector, taste] = await Promise.all([getQueryEmbedding(params.q), getUserTasteVector(userId)]);
+  const blended = blendVectors(queryVector, taste, params.tasteInfluence);
+  if (!blended) throw new Error("Could not blend recommendation vectors");
+  const candidates = await nearestItems(blended, userId, params.limit * 4, params.type === "all" ? undefined : params.type, [], params.excludeLogged, params.yearFrom, params.yearTo);
+  return { items: applyGenreDiversity(candidates, params.limit).map((item) => ({ ...item, reason: "blend" })), hasTaste: taste !== null };
 }
 
 export async function getRecentRecommendations(userId: string, limit = 6): Promise<Record<ItemType, RecentRecommendation[]>> {

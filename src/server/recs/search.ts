@@ -33,7 +33,7 @@ export function groupHitsByType(hits: SemanticSearchHit[]): Record<ItemType, Sem
   };
 }
 
-async function embedQuery(query: string): Promise<number[]> {
+export async function getQueryEmbedding(query: string): Promise<number[]> {
   const cacheKey = query.trim().toLocaleLowerCase();
   const cached = queryCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.vector;
@@ -99,7 +99,7 @@ export async function searchCachedItemsSemantic(
   params: SemanticSearchParams,
   userId: string,
 ): Promise<SemanticSearchHit[]> {
-  const vector = await embedQuery(params.q);
+  const vector = await getQueryEmbedding(params.q);
   const vectorLiteral = toVectorLiteral(vector);
   const type = params.type ?? "all";
   const limit = params.limit ?? 5;
