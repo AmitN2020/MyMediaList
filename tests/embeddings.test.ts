@@ -120,6 +120,7 @@ describe("Embeddings Pipeline - Task 5.1", () => {
         apiKey: "test-key",
         maxRetries: 2,
         fetchFn: mockFetch as unknown as typeof fetch,
+        sleep: async () => undefined,
       });
 
       const vectors = await provider.embed(["Text with retry"]);

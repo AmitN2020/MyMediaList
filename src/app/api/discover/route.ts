@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { jsonError } from "@/lib/api";
 import { discoverQuerySchema } from "@/lib/discover-schemas";
 import { searchCachedItemsText } from "@/server/recs/text-search";
+import { groupHitsByType, searchCachedItemsSemantic } from "@/server/recs/search";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -37,9 +38,23 @@ export async function GET(request: Request) {
     return Response.json({ items, total, query: parsed.data });
   }
 
-  return jsonError(
-    501,
-    "NOT_IMPLEMENTED",
-    "Semantic search mode is not implemented yet",
-  );
+  try {
+    const items = await searchCachedItemsSemantic(
+      {
+        q: parsed.data.q,
+        type: parsed.data.type,
+        limit: parsed.data.limit,
+        excludeLogged: parsed.data.exclude_logged,
+      },
+      session.user.id,
+    );
+    return Response.json({
+      items,
+      groups: groupHitsByType(items),
+      query: parsed.data,
+    });
+  } catch (error) {
+    console.error("Semantic discovery failed:", error);
+    return jsonError(502, "EMBEDDING_UNAVAILABLE", "Semantic search is temporarily unavailable");
+  }
 }

@@ -12,6 +12,7 @@ export type GeminiEmbeddingOptions = {
   delayBetweenBatchesMs?: number;
   maxRetries?: number;
   fetchFn?: typeof fetch;
+  sleep?: (milliseconds: number) => Promise<void>;
 };
 
 export class GeminiEmbeddingProvider implements EmbeddingProvider {
@@ -22,6 +23,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
   private readonly delayBetweenBatchesMs: number;
   private readonly maxRetries: number;
   private readonly fetchFn: typeof fetch;
+  private readonly sleep: (milliseconds: number) => Promise<void>;
 
   constructor(options: GeminiEmbeddingOptions = {}) {
     this.apiKey =
@@ -34,6 +36,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
     this.delayBetweenBatchesMs = options.delayBetweenBatchesMs || 200;
     this.maxRetries = options.maxRetries ?? 5;
     this.fetchFn = options.fetchFn || globalThis.fetch;
+    this.sleep = options.sleep || ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
   }
 
   async embed(texts: string[]): Promise<number[][]> {
@@ -56,9 +59,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
       results.push(...batchVectors);
 
       if (i + this.batchSize < texts.length && this.delayBetweenBatchesMs > 0) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, this.delayBetweenBatchesMs),
-        );
+        await this.sleep(this.delayBetweenBatchesMs);
       }
     }
 
@@ -113,7 +114,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
                 `[Gemini Rate Limit] Pausing for ${Math.round(backoff / 1000)}s before retry ${attempt}/${this.maxRetries}...`,
               );
             }
-            await new Promise((resolve) => setTimeout(resolve, backoff));
+            await this.sleep(backoff);
             continue;
           }
 
@@ -138,7 +139,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
           throw err instanceof Error ? err : new Error(String(err));
         }
         const backoff = Math.pow(2, attempt) * 500 + Math.random() * 200;
-        await new Promise((resolve) => setTimeout(resolve, backoff));
+        await this.sleep(backoff);
       }
     }
 

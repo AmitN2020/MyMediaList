@@ -14,7 +14,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:backfill": "tsx --env-file=.env scripts/backfill-embeddings.ts",
-    "seed": "tsx --env-file=.env scripts/seed.ts"
+    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "eval:recs": "tsx --env-file=.env scripts/eval-recs.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
