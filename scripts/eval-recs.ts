@@ -1,4 +1,6 @@
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {}
 
 import { eq } from "drizzle-orm";
 import { db } from "../src/db/client";

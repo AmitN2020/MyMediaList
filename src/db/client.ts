@@ -6,7 +6,11 @@ declare global {
   var _postgresClient: postgres.Sql | undefined;
 }
 
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {
+  // .env is not present on disk (e.g. Vercel, CI, Docker where env vars are injected)
+}
 
 const connectionString = process.env.DATABASE_URL;
 

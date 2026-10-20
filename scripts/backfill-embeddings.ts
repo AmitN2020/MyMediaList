@@ -1,4 +1,6 @@
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {}
 
 import { isNull, sql } from "drizzle-orm";
 import { db } from "../src/db/client";

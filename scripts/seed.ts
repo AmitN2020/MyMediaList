@@ -1,4 +1,6 @@
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {}
 
 import bcrypt from "bcryptjs";
 import { and, eq, sql } from "drizzle-orm";

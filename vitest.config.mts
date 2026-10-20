@@ -1,7 +1,11 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {
+  // .env is optional in CI/environments where env vars are already set
+}
 
 export default defineConfig({
   test: {
