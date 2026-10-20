@@ -33,14 +33,16 @@ export function ThemeProvider({
   const [resolvedTheme, setResolvedTheme] = React.useState<"dark" | "light">("light");
 
   React.useEffect(() => {
-    try {
-      const savedTheme = localStorage.getItem(storageKey) as Theme | null;
-      if (savedTheme && (savedTheme === "dark" || savedTheme === "light" || savedTheme === "system")) {
-        setThemeState(savedTheme);
+    queueMicrotask(() => {
+      try {
+        const savedTheme = localStorage.getItem(storageKey) as Theme | null;
+        if (savedTheme && (savedTheme === "dark" || savedTheme === "light" || savedTheme === "system")) {
+          setThemeState(savedTheme);
+        }
+      } catch {
+        // Ignore localStorage read failures
       }
-    } catch {
-      // Ignore localStorage read failures
-    }
+    });
   }, [storageKey]);
 
   React.useEffect(() => {
