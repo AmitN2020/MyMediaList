@@ -5,40 +5,13 @@ import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { RecommendationShelves } from "@/components/recommendation-shelves";
 
-async function HeroActions() {
-  await connection();
-  const session = await auth();
-
-  if (session?.user) {
-    return (
-      <>
-        <Link href="/library">
-          <Button size="lg" className="h-11 px-6">
-            Go to Your Library
-          </Button>
-        </Link>
-        <Link href="/search">
-          <Button size="lg" variant="outline" className="h-11 px-6">
-            Search Catalog
-          </Button>
-        </Link>
-      </>
-    );
-  }
-
+function HeroActions() {
   return (
-    <>
-      <Link href="/login">
-        <Button size="lg" className="h-11 px-6">
-          Get Started Free
-        </Button>
-      </Link>
-      <Link href="/search">
-        <Button size="lg" variant="outline" className="h-11 px-6">
-          Explore Media
-        </Button>
-      </Link>
-    </>
+    <Link href="/login">
+      <Button size="lg" className="h-11 px-6">
+        Get Started for Free
+      </Button>
+    </Link>
   );
 }
 
@@ -46,12 +19,27 @@ function HeroActionsSkeleton() {
   return (
     <div className="flex gap-3">
       <div className="h-11 w-36 animate-pulse rounded-lg bg-muted/60" />
-      <div className="h-11 w-36 animate-pulse rounded-lg bg-muted/40" />
     </div>
   );
 }
 
-export default function HomePage() {
+// Separate component to handle the dynamic auth check inside Suspense
+async function HomeContent() {
+  await connection();
+  const session = await auth();
+
+  // If logged in, show only the recommendations view
+  if (session?.user) {
+    return (
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-8">
+        <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-muted/40" />}>
+          <RecommendationShelves />
+        </Suspense>
+      </div>
+    );
+  }
+
+  // Default marketing view when not logged in
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-8">
       <section className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card via-muted/30 to-card p-8 sm:p-14 shadow-sm">
@@ -63,7 +51,7 @@ export default function HomePage() {
             Track everything you watch and read.
           </h1>
           <p className="text-base text-muted-foreground sm:text-lg">
-            One unified place for movies, TV shows, and books. Discover connections across media powered by vector recommendations.
+            One unified place for movies, TV shows, and books. Discover new content through recommendations based on what you like.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-4">
@@ -91,7 +79,7 @@ export default function HomePage() {
           </div>
           <h3 className="font-semibold text-lg">Books</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Track novels, non-fiction, and audiobooks with Open Library. Organize reading lists seamlessly alongside watchlists.
+            Track books with Open Library. Organize your reading lists seamlessly alongside watchlists.
           </p>
         </div>
 
@@ -99,9 +87,9 @@ export default function HomePage() {
           <div className="flex size-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500 font-bold mb-4">
             ✨
           </div>
-          <h3 className="font-semibold text-lg">Vector Intelligence</h3>
+          <h3 className="font-semibold text-lg">Recommendations</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            High-dimensional embeddings connect themes, tone, and creators across movies, shows, and books.
+            Get movie, tv show, and book recommendations based on what you like.
           </p>
         </div>
       </section>
@@ -110,5 +98,13 @@ export default function HomePage() {
         <RecommendationShelves />
       </Suspense>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto max-w-7xl px-4 py-12 sm:px-8 h-96 animate-pulse rounded-3xl bg-muted/20" />}>
+      <HomeContent />
+    </Suspense>
   );
 }

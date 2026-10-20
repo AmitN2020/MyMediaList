@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { BookOpen, Film, Tv, ArrowLeft } from "lucide-react";
 import { db } from "@/db/client";
 import { items } from "@/db/schema";
@@ -36,6 +37,7 @@ function ItemDetailSkeleton() {
 }
 
 async function ItemDetails({ params }: PageProps) {
+  await connection();
   const { id } = await params;
 
   const item = await db.query.items.findFirst({ where: eq(items.id, id) });
